@@ -2,6 +2,25 @@
 
 import { useState } from 'react';
 
+function FilterableProductTable({ products }) {
+  const [filterText, setFilterText] = useState('');
+  const [inStockOnly, setInStockOnly] = useState(false);
+
+  return (
+    <div>
+      <SearchBar 
+        filterText={filterText} 
+        inStockOnly={inStockOnly} 
+        onFilterTextChange={setFilterText} 
+        onInStockOnlyChange={setInStockOnly} />
+      <ProductTable 
+        products={products} 
+        filterText={filterText}
+        inStockOnly={inStockOnly} />
+    </div>
+  );
+}
+
 function ProductCategoryRow({ category }) {
   return (
     <tr>
@@ -69,41 +88,27 @@ function ProductTable({ products, filterText, inStockOnly }) {
   );
 }
 
-function SearchBar({ filterText, inStockOnly }) {
+function SearchBar({
+  filterText,
+  inStockOnly,
+  onFilterTextChange,
+  onInStockOnlyChange
+}) {
   return (
     <form>
       <input 
         type="text" 
-        value={filterText} 
-        placeholder="Search..."
+        value={filterText} placeholder="Search..." 
         onChange={(e) => onFilterTextChange(e.target.value)} />
       <label>
         <input 
           type="checkbox" 
-          checked={inStockOnly} />
+          checked={inStockOnly} 
+          onChange={(e) => onInStockOnlyChange(e.target.checked)} />
         {' '}
         Only show products in stock
       </label>
     </form>
-  );
-}
-
-function FilterableProductTable({ products }) {//componente en la cima de la gerarquia
-  //variables de estado y especifica el estado inicial de tu aplicación:
-  const [filterText, setFilterText] = useState('');
-  const [inStockOnly, setInStockOnly] = useState(false);
-  return (
-    <div>
-      <SearchBar 
-        filterText={filterText} 
-        inStockOnly={inStockOnly} 
-        onFilterTextChange={setFilterText}
-        onInStockOnlyChange={setInStockOnly} />
-      <ProductTable 
-        products={products}
-        filterText={filterText}
-        inStockOnly={inStockOnly} />
-    </div>
   );
 }
 
@@ -118,8 +123,8 @@ const PRODUCTS = [
 
 export default function App() {
   return <main className="min-h-screen">
-    <FilterableProductTable products={PRODUCTS} />
-  </main> 
+      <FilterableProductTable products={PRODUCTS} />
+    </main>;
 }
 
 /**
