@@ -1,3 +1,7 @@
+'use client';
+
+import { useState } from 'react';
+
 function ProductCategoryRow({ category }) {
   return (
     <tr>
@@ -22,11 +26,21 @@ function ProductRow({ product }) {
   );
 }
 
-function ProductTable({ products }) {
+function ProductTable({ products, filterText, inStockOnly }) {
   const rows = [];
   let lastCategory = null;
 
   products.forEach((product) => {
+    if (
+      product.name.toLowerCase().indexOf(
+        filterText.toLowerCase()
+      ) === -1
+    ) {
+      return;
+    }
+    if (inStockOnly && !product.stocked) {
+      return;
+    }
     if (product.category !== lastCategory) {
       rows.push(
         <ProductCategoryRow
@@ -55,12 +69,18 @@ function ProductTable({ products }) {
   );
 }
 
-function SearchBar() {
+function SearchBar({ filterText, inStockOnly }) {
   return (
     <form>
-      <input type="text" placeholder="Search..." />
+      <input 
+        type="text" 
+        value={filterText} 
+        placeholder="Search..."
+        onChange={(e) => onFilterTextChange(e.target.value)} />
       <label>
-        <input type="checkbox" />
+        <input 
+          type="checkbox" 
+          checked={inStockOnly} />
         {' '}
         Only show products in stock
       </label>
@@ -68,11 +88,21 @@ function SearchBar() {
   );
 }
 
-function FilterableProductTable({ products }) {
+function FilterableProductTable({ products }) {//componente en la cima de la gerarquia
+  //variables de estado y especifica el estado inicial de tu aplicación:
+  const [filterText, setFilterText] = useState('');
+  const [inStockOnly, setInStockOnly] = useState(false);
   return (
     <div>
-      <SearchBar />
-      <ProductTable products={products} />
+      <SearchBar 
+        filterText={filterText} 
+        inStockOnly={inStockOnly} 
+        onFilterTextChange={setFilterText}
+        onInStockOnlyChange={setInStockOnly} />
+      <ProductTable 
+        products={products}
+        filterText={filterText}
+        inStockOnly={inStockOnly} />
     </div>
   );
 }
@@ -91,3 +121,25 @@ export default function App() {
     <FilterableProductTable products={PRODUCTS} />
   </main> 
 }
+
+/**
+ * Ahora que has identificado los componentes en el boceto, ordénalos en una jerarquía:
+FilterableProductTable    - componente en sima de la gerarquia
+  SearchBar               - componente hijo 
+  ProductTable            - componente hijo
+    ProductCategoryRow    - componente hijo
+    ProductRow
+
+    Después de construir tus componentes, tendrás una biblioteca de componentes reutilizables que renderizan tu modelo de datos. 
+
+    Tu primer COMPONENTE
+    Los componentes son uno de los conceptos esenciales de React. 
+    Constituyen los cimientos sobre los que construyes interfaces de usuario (UIs por sus siglas en inglés). 
+    ¡Y eso los convierte en el lugar perfecto para comenzar tu recorrido por React!
+
+    El componente en la cima de la jerarquía (FilterableProductTable) tomará tu modelo de datos como una prop. 
+    Este se conoce como flujo de datos en un sentido, porque estos datos fluyen hacia abajo desde el componente 
+    en el nivel superior hacia aquellos que están al final del árbol.
+
+    Para familiarisarme con los conseptos y terminologias
+ */
